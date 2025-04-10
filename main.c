@@ -65,6 +65,3 @@ void darBanho(Tamagotchi meuTamagotchi){
     meuTamagotchi.felicidade += 5;
 }
 
-void ficarDoente(Tamagotchi zezinho){
-    zezinho.doente = true;
-}
