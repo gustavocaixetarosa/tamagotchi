@@ -1,12 +1,12 @@
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define TEMPO_MAXIMO 168
 #define ATRIB_MAX 10
 #define ATRIB_MIN 0
-
 
 typedef struct {
     int tempo_de_vida_em_horas;
@@ -28,101 +28,116 @@ Tamagotchi novoTamagotchi(char nome[]) {
     return t;
 }
 
-
-void alimentar(Tamagotchi tamagotchi);
-
-void alterarFelicidade(Tamagotchi tamagotchi, int valor);
-
-void alterarFome(Tamagotchi tamagotchi, int valor);
-
-void avancarNoTempo(Tamagotchi tamagotchi);
-
+void alimentar(Tamagotchi* tamagotchi);
+void alterarFelicidade(Tamagotchi* tamagotchi, int valor);
+void alterarFome(Tamagotchi* tamagotchi, int valor);
+void avancarTempo(Tamagotchi* tamagotchi);
+void darBanho(Tamagotchi* tamagotchi);
+void desligar();
+void jogar(Tamagotchi* tamagotchi);
 void mostrarMenu();
-
-void jogar(Tamagotchi tamagotchi);
-
-void darBanho(Tamagotchi tamagotchi);
-
 int venceuPartida(int arma);
+void verStatus(Tamagotchi* tamagotchi);
+void verificarStatus(Tamagotchi* tamagotchi);
+const char* estaDoente(bool doente);
 
-void verificarStatus(Tamagotchi tamagotchi);
-
-int main(){
-    int opcao;
+int main() {
     char nomeEscolhido[20];
-    printf("Qual o nome desejada para seu novo bichinho?: ");
-    scanf("%c ", &nomeEscolhido);
+    printf("Qual o nome desejado para seu novo bichinho?: ");
+    scanf("%s", nomeEscolhido);
 
     Tamagotchi t1 = novoTamagotchi(nomeEscolhido);    
-    int escolha_menu = 0;
+    int opcao = 0;
 
-    do{
+    do {
         mostrarMenu();
-        printf("Escolha uma opção: ");
+        printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
-        switch (escolha_menu)
-        {
-        case 1:
-            avancarTempo(t1);
-            break;
-        case 2:
-            alimentar(t1);
-            break;
-        case 3:
-            jogar(t1);
-            break;
-        case 4:
-            darBanho(t1);
-            break;
-        case 5:
-            verStatus(t1);
-            break;
-        case 6:
-            desligar(t1);
-            break;
-        default:
-            desligar(t1);
-            break;
+        switch (opcao) {
+            case 1:
+                avancarTempo(&t1);
+                break;
+            case 2:
+                alimentar(&t1);
+                break;
+            case 3:
+                jogar(&t1);
+                break;
+            case 4:
+                darBanho(&t1);
+                break;
+            case 5:
+                verStatus(&t1);
+                break;
+            case 6:
+                desligar();
+                break;
+            default:
+                desligar();
+                break;
         }
-    } while(escolha_menu != 6);
+    } while (opcao != 6);
 
     return 0;
 }
 
-
-void alimentar(Tamagotchi tamagotchi){
-    if(tamagotchi.fome == ATRIB_MIN){
-        printf("%c não está com fome. Ficou titi!", tamagotchi.nome);
+void alimentar(Tamagotchi* tamagotchi) {
+    if(tamagotchi->fome == ATRIB_MIN){
+        printf("%s nao esta com fome. Ficou titi!\n", tamagotchi->nome);
         alterarFelicidade(tamagotchi, -2);
-    } else if(tamagotchi.fome > 4){
+    } else if(tamagotchi->fome > 4){
         alterarFome(tamagotchi, -4);
     } else {
-        tamagotchi.fome = ATRIB_MIN;
+        tamagotchi->fome = ATRIB_MIN;
     }
 }
 
-void alterarFome(Tamagotchi tamagotchi, int valor){
-    
+void alterarFelicidade(Tamagotchi* tamagotchi, int valor){
+    if(tamagotchi->felicidade + valor > ATRIB_MAX){
+        tamagotchi->felicidade = ATRIB_MAX;
+    } else if(tamagotchi->felicidade + valor < ATRIB_MIN){
+        tamagotchi->felicidade = ATRIB_MIN;
+    } else {
+        tamagotchi->felicidade += valor;
+    }
 }
 
-void avancarTempo(Tamagotchi tamagotchi){
-    verificarStatus(tamagotchi);
-    tamagotchi.tempo_de_vida_em_horas += 8;
-    alterarFelicidade(tamagotchi, -2);
-    tamagotchi.felicidade -= 3; 
+void alterarFome(Tamagotchi* tamagotchi, int valor){
+    if(tamagotchi->fome + valor > ATRIB_MAX){
+        tamagotchi->fome = ATRIB_MAX;
+    } else if(tamagotchi->fome + valor < ATRIB_MIN){
+        tamagotchi->fome = ATRIB_MIN;
+    } else {
+        tamagotchi->fome += valor;
+    }
 }
-void darBanho(Tamagotchi tamagotchi){
-    if(tamagotchi.limpeza == ATRIB_MAX){
-        printf("%c já estava limpo. Que maldade!\n", tamagotchi.nome);
+
+void avancarTempo(Tamagotchi* tamagotchi){
+    verificarStatus(tamagotchi);
+    tamagotchi->tempo_de_vida_em_horas += 8;
+    alterarFelicidade(tamagotchi, -2);
+}
+
+void desligar(){
+    printf("Tamagotchi desligado. Até mais!\n");
+}
+
+void darBanho(Tamagotchi* tamagotchi){
+    if(tamagotchi->limpeza == ATRIB_MAX){
+        printf("%s já estava limpo. Que maldade!\n", tamagotchi->nome);
         alterarFelicidade(tamagotchi, -6);
         return;
     }
-    tamagotchi.limpeza = ATRIB_MAX;
+    tamagotchi->limpeza = ATRIB_MAX;
     alterarFelicidade(tamagotchi, 5);
 }
 
-void jogar(Tamagotchi tamagotchi){
+const char* estaDoente(bool doente){
+    return doente ? "Sim" : "Não";
+}
+
+void jogar(Tamagotchi* tamagotchi){
     int arma;
     printf(" *** PEDRA, PAPEL, TESOURA ***\n");
     printf("1. Pedra\n");
@@ -136,7 +151,7 @@ void jogar(Tamagotchi tamagotchi){
         printf("Você venceu!\n");
         alterarFelicidade(tamagotchi, 3);
     } else if(resultado == 2){
-        printf("%c venceu!\n", tamagotchi.nome);
+        printf("%s venceu!\n", tamagotchi->nome);
         alterarFelicidade(tamagotchi, 5);
     } else{
         printf("Empate!\n");
@@ -144,7 +159,8 @@ void jogar(Tamagotchi tamagotchi){
 }
 
 void mostrarMenu() {
-    printf("1. Avançar o tempo\n");
+    printf("\n*** MENU ***\n");
+    printf("1. Avancar o tempo\n");
     printf("2. Alimentar\n");
     printf("3. Jogar\n");
     printf("4. Dar banho\n");
@@ -153,30 +169,39 @@ void mostrarMenu() {
 }
 
 int venceuPartida(int arma) {
-    int armaDoPet = rand() % 3;
+    int armaDoPet = rand() % 3 + 1;
 
     printf("Sua arma: %d\n", arma);
     printf("Arma do pet: %d\n", armaDoPet);
 
     if(arma == armaDoPet) {
         return 0;
-    } else if((arma == 0 && armaDoPet == 2) || 
-              (arma == 1 && armaDoPet == 0) || 
-              (arma == 2 && armaDoPet == 1)) {
+    } else if((arma == 1 && armaDoPet == 3) || 
+              (arma == 2 && armaDoPet == 1) || 
+              (arma == 3 && armaDoPet == 2)) {
         return 1;
     } else {
         return 2;
     }
 }
 
-void verificarStatus(Tamagotchi tamagotchi){
-    if (tamagotchi.limpeza < 2){
-        printf("%c vai morrer de sujeira!!!", tamagotchi.nome);
-    } 
-
-    if(tamagotchi.fome < 1){
-        printf("%c vai morrer de fome!!!", tamagotchi.nome);
-    }
+void verStatus(Tamagotchi* tamagotchi){
+    printf("\n *** STATUS ***\n");
+    printf(" %s :    Tempo de vida: %d horas\nFelicidade: %d\nFome: %d\nLimpeza: %d\nDoente: %s\n", 
+           tamagotchi->nome, 
+           tamagotchi->tempo_de_vida_em_horas, 
+           tamagotchi->felicidade, 
+           tamagotchi->fome, 
+           tamagotchi->limpeza, 
+           estaDoente(tamagotchi->doente));
 }
 
+void verificarStatus(Tamagotchi* tamagotchi){
+    if (tamagotchi->limpeza < 2){
+        printf("%s vai morrer de sujeira!!!\n", tamagotchi->nome);
+    } 
 
+    if(tamagotchi->fome > 8){
+        printf("%s vai morrer de fome!!!\n", tamagotchi->nome);
+    }
+}
