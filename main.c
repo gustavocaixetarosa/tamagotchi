@@ -159,7 +159,7 @@ void jogar(Tamagotchi* tamagotchi){
 }
 
 void mostrarMenu() {
-    printf("\n*** MENU ***\n");
+    printf("\n\n\n*** MENU ***\n");
     printf("1. Avancar o tempo\n");
     printf("2. Alimentar\n");
     printf("3. Jogar\n");
